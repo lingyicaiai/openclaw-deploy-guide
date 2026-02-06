@@ -1,4 +1,5 @@
 # /etc/systemd/system/openclaw-gateway.service
+# Root-run template (loopback only)
 
 [Unit]
 Description=OpenClaw Gateway
@@ -7,9 +8,9 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-User=ubuntu
-WorkingDirectory=/home/ubuntu
-Environment=HOME=/home/ubuntu
+User=root
+WorkingDirectory=/root
+Environment=HOME=/root
 Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 ExecStart=/usr/bin/openclaw gateway --port 18789 --bind loopback
 Restart=always
