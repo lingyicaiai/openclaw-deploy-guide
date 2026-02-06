@@ -65,6 +65,13 @@ sudo -H openclaw onboard
 
 ## 5) 创建 systemd Gateway 服务（仅本机监听）
 
+仓库里提供了两份模板（推荐直接复制使用）：
+
+- `systemd/openclaw-gateway.root.service`（root 运行）
+- `systemd/openclaw-gateway.ubuntu.service`（ubuntu 运行）
+
+### 方案 A：root 运行（当前默认示例）
+
 ```bash
 sudo tee /etc/systemd/system/openclaw-gateway.service >/dev/null <<'EOF'
 [Unit]
@@ -77,16 +84,51 @@ Type=simple
 User=root
 WorkingDirectory=/root
 Environment=HOME=/root
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 ExecStart=/usr/bin/openclaw gateway --port 18789 --bind loopback
 Restart=always
 RestartSec=3
 StandardOutput=journal
 StandardError=journal
+KillMode=mixed
+TimeoutStopSec=60
+KillSignal=SIGTERM
 
 [Install]
 WantedBy=multi-user.target
 EOF
 ```
+
+### 方案 B：ubuntu 运行（不新增用户）
+
+```bash
+sudo tee /etc/systemd/system/openclaw-gateway.service >/dev/null <<'EOF'
+[Unit]
+Description=OpenClaw Gateway
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu
+Environment=HOME=/home/ubuntu
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ExecStart=/usr/bin/openclaw gateway --port 18789 --bind loopback
+Restart=always
+RestartSec=3
+StandardOutput=journal
+StandardError=journal
+KillMode=mixed
+TimeoutStopSec=60
+KillSignal=SIGTERM
+
+[Install]
+WantedBy=multi-user.target
+EOF
+```
+
+注意：如果你切换到 `User=ubuntu`，需要确保 ubuntu 的配置存在于：`/home/ubuntu/.openclaw/openclaw.json`，并且 workspace 路径正确。
 
 ---
 
