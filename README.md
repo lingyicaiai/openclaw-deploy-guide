@@ -56,7 +56,7 @@ openclaw --version
 ## 4) 初始化配置（认证/生成配置文件）
 
 ```bash
-sudo -H openclaw onboard
+openclaw onboard
 ```
 
 会在 `~/.openclaw/` 下生成配置与工作区（具体路径以向导输出为准）。
@@ -132,42 +132,23 @@ EOF
 
 ### ubuntu 是否需要重新 `openclaw onboard`？
 
-- **新机器首次用 ubuntu 跑**：建议用 ubuntu 身份执行一次：
+- **新机器首次用 ubuntu 跑**：用 ubuntu 身份执行一次：
   ```bash
   sudo -u ubuntu -H openclaw onboard
   ```
-  这样会在 `/home/ubuntu/.openclaw/` 下生成配置与 workspace。
 
-- **从 root 迁移到 ubuntu**：如果你已经把 `/root/.openclaw/` 完整复制到了 `/home/ubuntu/.openclaw/`，通常**不需要再 onboard**；只要改 service 为 `User=ubuntu` 并重启即可。
-
+- **从 root 迁移到 ubuntu**：如果已经把 `/root/.openclaw/` 完整复制到 `/home/ubuntu/.openclaw/`，通常不需要再 onboard。
 ---
 
-## 6) 启动 / 重启 / 开机自启（这几条有什么区别？）
-
-改过 service 文件后，通常都要先：
+## 6) 启动并设置开机自启（推荐）
 
 ```bash
 sudo systemctl daemon-reload
-```
-
-然后根据你的场景选择：
-
-### 首次部署（还没启用过）
-
-- `enable`：设置开机自启
-- `--now`：立刻启动服务
-
-```bash
 sudo systemctl enable --now openclaw-gateway
 ```
 
-### 已部署在跑，只是修改了 service / 环境变量 / User 等
-
-- `restart`：停止再启动，让新配置生效（会短暂停机）
-
-```bash
-sudo systemctl restart openclaw-gateway
-```
+> 如果你后续修改了 service 文件（比如切换 User=root/ubuntu），再执行：
+> `sudo systemctl daemon-reload && sudo systemctl restart openclaw-gateway`
 
 ---
 
