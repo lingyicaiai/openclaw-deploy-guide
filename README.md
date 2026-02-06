@@ -63,12 +63,9 @@ openclaw onboard
 
 ## 5) 创建 systemd Gateway 服务（仅本机监听）
 
-仓库里提供了两份模板（推荐直接复制使用）：
+下面给两份可直接复制粘贴的模板（任选其一）：
 
-- `systemd/openclaw-gateway.root.service`（root 运行）
-- `systemd/openclaw-gateway.ubuntu.service`（ubuntu 运行）
-
-### 方案 A：root 运行（当前默认示例）
+### 方案 A：root 运行
 
 ```bash
 sudo tee /etc/systemd/system/openclaw-gateway.service >/dev/null <<'EOF'
@@ -139,7 +136,7 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now openclaw-gateway
 ```
 
-后续你修改了 service 文件（比如从 root 切到 ubuntu，或改了 ExecStart/环境变量），用这两条让它生效：
+当你“改过 service 内容”后（例如从 root 切到 ubuntu，或修改 ExecStart/环境变量），就用这两条让改动生效：
 
 ```bash
 sudo systemctl daemon-reload
@@ -159,9 +156,3 @@ sudo journalctl -u openclaw-gateway -f
 # 确认只在本机监听
 ss -ltnp | grep 18789
 ```
-
----
-
-## License
-
-MIT
