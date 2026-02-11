@@ -136,19 +136,23 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now openclaw-gateway
 ```
 
-当你“改过 service 内容”后（例如从 root 切到 ubuntu，或修改 ExecStart/环境变量），就用这两条让改动生效：
+当你“改过 service 内容”后（例如从 root 切到 ubuntu，或修改 ExecStart/环境变量），按这个流程让改动生效：
+
+```bash
+# 1) 先停掉旧进程（避免你以为重启成功，实际还是旧参数在跑）
+sudo systemctl stop openclaw-gateway
+
+# 2) 让 systemd 重新加载 unit 文件
+sudo systemctl daemon-reload
+
+# 3) 用新配置启动
+sudo systemctl start openclaw-gateway
+```
+
+如果你只是改了少量参数、且确定不会残留旧进程，也可以直接：
 
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl restart openclaw-gateway
-```
-
-常用管理命令：
-
-```bash
-# 停止/启动/重启 gateway
-sudo systemctl stop openclaw-gateway
-sudo systemctl start openclaw-gateway
 sudo systemctl restart openclaw-gateway
 ```
 
@@ -272,6 +276,17 @@ openclaw node run --host 43.156.245.19 --port 18789
 5) **Options 页不是 attach**
 - Options 页只显示 relay 状态/端口；必须在目标 tab 点扩展让角标 ON。
 
-### 8.8 常用运维补充命令
+6) **Extension 只认本机 127.0.0.1:18792（所以 18792 不监听就必红叹号）**
+- 常见误解：以为 extension 会去连服务器。
+- 实际：extension 连接的是“Chrome 所在这台电脑”的 `127.0.0.1:18792`。
+- 快速验证（Windows）：
+  - `netstat -ano | findstr :18792`
 
-（已合并到 **6) 启动并设置开机自启**，避免重复。）
+7) **Node 在线但看不到 tabs：大概率没 attach（tabCount=0）**
+- 服务端验证（Gateway 侧）：
+  - `openclaw nodes status`
+  - 或用 node browser proxy 看 profiles：`browser.proxy /profiles`（看到 chrome running=true 但 tabCount=0 就是没 attach）
+
+8) **本次真实根因（2026-02-11）**
+- 新电脑处于 remote/fallback 的异常状态，导致本机 relay 没起来 → 18792 没监听 → extension `!`。
+- 通过 node 的 browser proxy 看到 `chrome cdpUrl=http://127.0.0.1:18792 running=true` 后，手动在公众号页点击扩展 ON，tabCount 从 0→1，Gateway 立刻能看到 tab。
