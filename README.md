@@ -143,6 +143,21 @@ sudo systemctl daemon-reload
 sudo systemctl restart openclaw-gateway
 ```
 
+常用管理命令：
+
+```bash
+# 停止/启动/重启 gateway
+sudo systemctl stop openclaw-gateway
+sudo systemctl start openclaw-gateway
+sudo systemctl restart openclaw-gateway
+```
+
+进入 TUI（主会话）：
+
+```bash
+openclaw tui --session main
+```
+
 ---
 
 ## 7) 查看运行状态/日志
@@ -259,12 +274,4 @@ openclaw node run --host 43.156.245.19 --port 18789
 
 ### 8.8 常用运维补充命令
 
-```bash
-# 停止/启动/重启 gateway
-sudo systemctl stop openclaw-gateway
-sudo systemctl start openclaw-gateway
-sudo systemctl restart openclaw-gateway
-
-# 进入 TUI（主会话）
-openclaw tui --session main
-```
+（已合并到 **6) 启动并设置开机自启**，避免重复。）
